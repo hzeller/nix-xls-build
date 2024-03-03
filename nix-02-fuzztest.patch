@@ -1,0 +1,19 @@
+diff --git a/dependency_support/load_external.bzl b/dependency_support/load_external.bzl
+index e1a75e171..27c19e840 100644
+--- a/dependency_support/load_external.bzl
++++ b/dependency_support/load_external.bzl
+@@ -241,12 +241,12 @@ def load_external_repositories():
+     )
+ 
+     # Updated 2024-02-22; latest version compatible with our current Abseil dependency.
+-    FUZZTEST_COMMIT = "3c5fc5246bf9db709249eb15b43c75157d3ee568"
++    FUZZTEST_COMMIT = "a21e4c32a28a5ecfd29d7be4c012ca1f8b681f26"
+     http_archive(
+         name = "com_google_fuzztest",
+         strip_prefix = "fuzztest-" + FUZZTEST_COMMIT,
+         url = "https://github.com/google/fuzztest/archive/" + FUZZTEST_COMMIT + ".zip",
+-        sha256 = "af47d1489234249e5490b068635f5aaf141e45a08e0a8a61195157db02e9b21f",
++        sha256 = "489b3434419a2eb2f55712d1c6c81e8467dc5e1d4f068d4725f5f6e29b83c9c4",
+     )
+ 
+     # Updated 2023-2-1

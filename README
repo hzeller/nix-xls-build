@@ -1,0 +1,16 @@
+My local hacks to make xls compile on nix.
+
+In your xls checkout, link the shell.nix to your
+directory (and do the usual, either load it directly
+or have a direnv .envrc)
+
+Apply the patches
+for f in nix-*.patch ; do patch -p1 < $f ; done
+
+The rules_python() pulls a dynamically linked binary,
+so you need nix-ld to make it mostly work.
+https://github.com/Mic92/nix-ld
+
+# Build with --keep_going as not everything is
+# compiling yet.
+bazel build -c opt ... --keep_going
