@@ -1,0 +1,28 @@
+diff --git a/WORKSPACE b/WORKSPACE
+index 593fa09..4e861a6 100644
+--- a/WORKSPACE
++++ b/WORKSPACE
+@@ -55,6 +55,10 @@ load(
+ 
+ py_repositories()
+ 
++register_toolchains(
++    "@rules_python//python:autodetecting_toolchain",
++)
++
+ python_register_toolchains(
+     name = "python39",
+     python_version = "3.9",
+diff --git a/dependency_support/initialize_external.bzl b/dependency_support/initialize_external.bzl
+index ad8c0c4..749adaf 100644
+--- a/dependency_support/initialize_external.bzl
++++ b/dependency_support/initialize_external.bzl
+@@ -32,7 +32,7 @@ def initialize_external_repositories():
+     """Calls set-up methods for external repositories that require that."""
+     bazel_skylib_workspace()
+     protobuf_deps()
+-    rules_hdl_init(python_interpreter_target = python_interpreter_target)
++    rules_hdl_init()
+     rules_hdl_dependency_support()
+     setup_7zip()
+     rules_closure_dependencies()
