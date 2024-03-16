@@ -1,7 +1,7 @@
 { pkgs ? import <nixpkgs> {} }:
 let
-  #xls_used_stdenv = pkgs.stdenv;
-  xls_used_stdenv = pkgs.clang17Stdenv;
+  #xls_used_stdenv = pkgs.stdenv;   # clang-tidy and clangd works
+  xls_used_stdenv = pkgs.clang17Stdenv;  # official toolchain, not creating compile errors, but above won't work
 in
 xls_used_stdenv.mkDerivation {
   name = "xls-build-environment";
