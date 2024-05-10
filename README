@@ -1,16 +1,26 @@
 My local hacks to make xls compile on nix.
 
 In your xls checkout, link the shell.nix to your
-directory (and do the usual, either load it directly
-or have a direnv .envrc)
+directory (and the patch for convenience).
 
 Apply the patches
 for f in nix-*.patch ; do patch -p1 < $f ; done
 
-The rules_python() pulls a dynamically linked binary,
-so you need nix-ld to make it mostly work.
-https://github.com/Mic92/nix-ld
+Currently, this does not properly work with
+the downloaded llvm toolchain, as that can't deal
+with things found in /etc/os-release
+
+TODO: create an /etc/os-release file as part of
+the FHS.
+
+For now, we just compile with gcc (which creates
+some issues and can't compile all files).
 
 # Build with --keep_going as not everything is
 # compiling yet.
 bazel build -c opt ... --keep_going
+
+Ideally, we'd use something like shell.nix.ideal,
+but the bad interaction of bazel and Nix fighting
+for authority about what is hermetic makes this
+require a bit more work.
