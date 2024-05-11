@@ -24,16 +24,22 @@ BUG_REPORT_URL="https://bugs.debian.org/"
 in (pkgs.buildFHSEnv {
   name = "xls-compile-environment";
   targetPkgs = pkgs: (with pkgs; [
-    bazel_6
-    jdk11
+    osrelease          # fake os-release so that blaze llvm download works
+
+    gcc                # bootstrap
+    bazel_6 jdk11      # build tool
     git cacert         # some recursive workspace dependencies via git.
 
     # Various libraries that Python links
     python39
     libxcrypt-legacy
+
+    # Various things that the llvm symolic links
     libz
     expat
-    osrelease
-  ])
-  ;
+    zstd
+    libxml2
+    ncurses     # this provides libtinfo. Currenly not properly linking.
+  ]);
+  extraOutputsToInstall = [ "dev" ];
 }).env
