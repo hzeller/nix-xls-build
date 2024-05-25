@@ -1,41 +1,36 @@
 diff --git a/xls/build_rules/xls_ir_rules.bzl b/xls/build_rules/xls_ir_rules.bzl
-index 759a36e9c..12c0ac6c6 100644
+index 6e32595e0..ed9fb0b42 100644
 --- a/xls/build_rules/xls_ir_rules.bzl
 +++ b/xls/build_rules/xls_ir_rules.bzl
-@@ -1096,21 +1096,14 @@ def _xls_ir_cc_library_impl(ctx):
-     # Source files (.h and .cc) files are first generated unformatted, then
+@@ -1104,16 +1104,10 @@ def _xls_ir_cc_library_impl(ctx):
      # formatted with clangformat.
-     object_file = ctx.actions.declare_file(ctx.outputs.object_file.basename)
+     header_file = ctx.actions.declare_file(ctx.attr.file_basename + ".h")
+     source_file = ctx.actions.declare_file(ctx.attr.file_basename + ".cc")
 -    unformatted_header_file = ctx.actions.declare_file(
--        ctx.outputs.header_file.basename + ".unformatted",
+-        header_file.basename + ".unformatted",
 -    )
 -    unformatted_source_file = ctx.actions.declare_file(
--        ctx.outputs.source_file.basename + ".unformatted",
+-        source_file.basename + ".unformatted",
 -    )
--
-     header_file = ctx.actions.declare_file(ctx.outputs.header_file.basename)
-     source_file = ctx.actions.declare_file(ctx.outputs.source_file.basename)
  
-     aot_compiler_args = ctx.actions.args()
-     aot_compiler_args.add("-input", src)
--    aot_compiler_args.add("-output_header", unformatted_header_file.path)
-+    aot_compiler_args.add("-output_header", header_file.path)
-     aot_compiler_args.add("-output_object", object_file.path)
--    aot_compiler_args.add("-output_source", unformatted_source_file.path)
-+    aot_compiler_args.add("-output_source", source_file.path)
-     aot_compiler_args.add("-header_include_path", header_file.short_path)
+     aot_basic_function_args = ctx.actions.args()
+-    aot_basic_function_args.add("-output_header", unformatted_header_file.path)
+-    aot_basic_function_args.add("-output_source", unformatted_source_file.path)
++    aot_basic_function_args.add("-output_header", header_file.path)
++    aot_basic_function_args.add("-output_source", source_file.path)
+     aot_basic_function_args.add("-header_include_path", header_file.short_path)
  
-     if ctx.attr.with_msan:
-@@ -1127,7 +1120,7 @@ def _xls_ir_cc_library_impl(ctx):
-     runfiles = get_runfiles_for_xls(ctx, [aot_compiler_tool_runfiles], [src])
+     if ctx.attr.namespaces:
+@@ -1128,7 +1122,7 @@ def _xls_ir_cc_library_impl(ctx):
+     )
  
      ctx.actions.run(
--        outputs = [object_file, unformatted_header_file, unformatted_source_file],
-+        outputs = [object_file, header_file, source_file],
-         tools = [aot_compiler_tool],
+-        outputs = [unformatted_header_file, unformatted_source_file],
++        outputs = [header_file, source_file],
+         tools = [aot_basic_function_tool],
          inputs = runfiles.files,
-         arguments = [aot_compiler_args],
-@@ -1137,32 +1130,6 @@ def _xls_ir_cc_library_impl(ctx):
+         arguments = [aot_basic_function_args],
+@@ -1138,32 +1132,6 @@ def _xls_ir_cc_library_impl(ctx):
          toolchain = None,
      )
  
@@ -68,7 +63,7 @@ index 759a36e9c..12c0ac6c6 100644
      return [
          DefaultInfo(
              files = depset(
-@@ -1204,12 +1171,6 @@ xls_ir_cc_library = rule(
+@@ -1205,12 +1173,6 @@ xls_ir_cc_library = rule(
                  doc = "Comma-separated list of nested namespaces in which to " +
                        "place the generated function.",
              ),
@@ -78,11 +73,11 @@ index 759a36e9c..12c0ac6c6 100644
 -                cfg = "exec",
 -                default = Label("@llvm_toolchain//:clang-format"),
 -            ),
-             "with_msan": attr.bool(
-                 doc = "if the jit code should be compiled with msan",
-                 mandatory = True,
+         },
+     ),
+ )
 diff --git a/xls/delay_model/build_defs.bzl b/xls/delay_model/build_defs.bzl
-index e7adb0c86..710e56194 100644
+index adc956c3a..d0f43fe3f 100644
 --- a/xls/delay_model/build_defs.bzl
 +++ b/xls/delay_model/build_defs.bzl
 @@ -47,11 +47,9 @@ def delay_model(
@@ -98,10 +93,10 @@ index e7adb0c86..710e56194 100644
          **kwargs
      )
 diff --git a/xls/ir/BUILD b/xls/ir/BUILD
-index 158b7c309..33cc24cde 100644
+index 59ee34808..19beb037f 100644
 --- a/xls/ir/BUILD
 +++ b/xls/ir/BUILD
-@@ -1065,11 +1065,9 @@ genrule(
+@@ -1162,11 +1162,9 @@ genrule(
      srcs = ["op_header.tmpl"],
      outs = ["op.h"],
      cmd = "$(location :render_specification_against_template) $(location :op_header.tmpl)" +
@@ -113,7 +108,7 @@ index 158b7c309..33cc24cde 100644
      ],
  )
  
-@@ -1103,11 +1101,9 @@ genrule(
+@@ -1200,11 +1198,9 @@ genrule(
      srcs = ["op_source.tmpl"],
      outs = ["op.cc"],
      cmd = "$(location :render_specification_against_template) $(location :op_source.tmpl)" +
@@ -125,7 +120,7 @@ index 158b7c309..33cc24cde 100644
      ],
  )
  
-@@ -1116,11 +1112,9 @@ genrule(
+@@ -1213,11 +1209,9 @@ genrule(
      srcs = ["nodes_header.tmpl"],
      outs = ["nodes.h"],
      cmd = "$(location :render_specification_against_template) $(location :nodes_header.tmpl)" +
@@ -137,7 +132,7 @@ index 158b7c309..33cc24cde 100644
      ],
  )
  
-@@ -1129,11 +1123,9 @@ genrule(
+@@ -1226,11 +1220,9 @@ genrule(
      srcs = ["nodes_source.tmpl"],
      outs = ["nodes.cc"],
      cmd = "$(location :render_specification_against_template) $(location :nodes_source.tmpl)" +

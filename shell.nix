@@ -9,15 +9,9 @@ let
     osrelease = pkgs.writeTextFile {
       name = "os-release";
       text = ''
-PRETTY_NAME="Debian GNU/Linux 12 (bookworm)"
-NAME="Debian GNU/Linux"
-VERSION_ID="12"
-VERSION="12 (bookworm)"
-VERSION_CODENAME=bookworm
+# Information llvm toolchain uses to choose what to download.
 ID=debian
-HOME_URL="https://www.debian.org/"
-SUPPORT_URL="https://www.debian.org/support"
-BUG_REPORT_URL="https://bugs.debian.org/"
+VERSION_ID="12"
     '';
     };
   };
@@ -30,16 +24,20 @@ in (pkgs.buildFHSEnv {
     bazel_6 jdk11      # build tool
     git cacert         # some recursive workspace dependencies via git.
 
-    # Various libraries that Python links
+    # Various libraries that Python links dynamically
     python39
     libxcrypt-legacy
 
-    # Various things that the llvm symolic links
+    # Various things that llvm links dynamically
     libz
     expat
     zstd
     libxml2
-    ncurses     # this provides libtinfo. Currenly not properly linking.
+    ncurses.dev     # this provides libtinfo. Currenly not properly linking.
+ 
+    # Development tools
+    clang-tools_17
+    bazel-buildtools
   ]);
   extraOutputsToInstall = [ "dev" ];
 }).env
