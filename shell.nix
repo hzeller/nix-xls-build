@@ -15,13 +15,17 @@ VERSION_ID="12"
     '';
     };
   };
+  bazel = pkgs.bazel_6.override {
+    enableNixHacks = false;  # does not make a difference
+  };
+
 in (pkgs.buildFHSEnv {
   name = "xls-compile-environment";
   targetPkgs = pkgs: (with pkgs; [
     osrelease          # fake os-release so that blaze llvm download works
 
     gcc                # bootstrap
-    bazel_6 jdk11      # build tool
+    bazel jdk11      # build tool
     git cacert         # some recursive workspace dependencies via git.
 
     # Various libraries that Python links dynamically
@@ -33,7 +37,7 @@ in (pkgs.buildFHSEnv {
     expat
     zstd
     libxml2
-    ncurses.dev     # this provides libtinfo. Currenly not properly linking.
+    ncurses     # this provides libtinfo. Currenly not properly linking. Requires LD_LIBRARY_PATH
  
     # Development tools
     clang-tools_17

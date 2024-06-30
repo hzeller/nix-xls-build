@@ -1,146 +1,20 @@
 diff --git a/xls/build_rules/xls_ir_rules.bzl b/xls/build_rules/xls_ir_rules.bzl
-index 6e32595e0..ed9fb0b42 100644
+index b5cd2dce1..e48747e2b 100644
 --- a/xls/build_rules/xls_ir_rules.bzl
 +++ b/xls/build_rules/xls_ir_rules.bzl
-@@ -1104,16 +1104,10 @@ def _xls_ir_cc_library_impl(ctx):
-     # formatted with clangformat.
-     header_file = ctx.actions.declare_file(ctx.attr.file_basename + ".h")
-     source_file = ctx.actions.declare_file(ctx.attr.file_basename + ".cc")
--    unformatted_header_file = ctx.actions.declare_file(
--        header_file.basename + ".unformatted",
--    )
--    unformatted_source_file = ctx.actions.declare_file(
--        source_file.basename + ".unformatted",
--    )
- 
-     aot_basic_function_args = ctx.actions.args()
--    aot_basic_function_args.add("-output_header", unformatted_header_file.path)
--    aot_basic_function_args.add("-output_source", unformatted_source_file.path)
-+    aot_basic_function_args.add("-output_header", header_file.path)
-+    aot_basic_function_args.add("-output_source", source_file.path)
-     aot_basic_function_args.add("-header_include_path", header_file.short_path)
- 
-     if ctx.attr.namespaces:
-@@ -1128,7 +1122,7 @@ def _xls_ir_cc_library_impl(ctx):
-     )
- 
-     ctx.actions.run(
--        outputs = [unformatted_header_file, unformatted_source_file],
-+        outputs = [header_file, source_file],
-         tools = [aot_basic_function_tool],
-         inputs = runfiles.files,
-         arguments = [aot_basic_function_args],
-@@ -1138,32 +1132,6 @@ def _xls_ir_cc_library_impl(ctx):
+@@ -1174,6 +1174,7 @@ def _xls_ir_cc_library_impl(ctx):
+             unformatted = unformatted_header_file.path,
+             formatted = header_file.path,
+         ),
++        use_default_shell_env = True,
          toolchain = None,
      )
  
--    ctx.actions.run_shell(
--        inputs = [unformatted_header_file],
--        outputs = [header_file],
--        tools = [ctx.executable._clang_format],
--        progress_message = "Formatting %s" % header_file.basename,
--        command = "{clang_format} {unformatted} > {formatted}".format(
--            clang_format = ctx.executable._clang_format.path,
--            unformatted = unformatted_header_file.path,
--            formatted = header_file.path,
--        ),
--        toolchain = None,
--    )
--
--    ctx.actions.run_shell(
--        inputs = [unformatted_source_file],
--        outputs = [source_file],
--        tools = [ctx.executable._clang_format],
--        progress_message = "Formatting %s" % source_file.basename,
--        command = "{clang_format} {unformatted} > {formatted}".format(
--            clang_format = ctx.executable._clang_format.path,
--            unformatted = unformatted_source_file.path,
--            formatted = source_file.path,
--        ),
--        toolchain = None,
--    )
--
-     return [
-         DefaultInfo(
-             files = depset(
-@@ -1205,12 +1173,6 @@ xls_ir_cc_library = rule(
-                 doc = "Comma-separated list of nested namespaces in which to " +
-                       "place the generated function.",
-             ),
--            "_clang_format": attr.label(
--                executable = True,
--                allow_files = True,
--                cfg = "exec",
--                default = Label("@llvm_toolchain//:clang-format"),
--            ),
-         },
-     ),
- )
-diff --git a/xls/delay_model/build_defs.bzl b/xls/delay_model/build_defs.bzl
-index adc956c3a..d0f43fe3f 100644
---- a/xls/delay_model/build_defs.bzl
-+++ b/xls/delay_model/build_defs.bzl
-@@ -47,11 +47,9 @@ def delay_model(
-         outs = ["{}.cc".format(name)],
-         cmd = ("$(location //xls/delay_model:generate_delay_lookup) " +
-                "--model_name={model_name} --precedence={precedence} $< " +
--               "| $(location @llvm_toolchain//:clang-format)" +
-                " > $(OUTS)").format(model_name = model_name, precedence = precedence),
-         tools = [
-             "//xls/delay_model:generate_delay_lookup",
--            "@llvm_toolchain//:clang-format",
-         ],
-         **kwargs
+@@ -1187,6 +1188,7 @@ def _xls_ir_cc_library_impl(ctx):
+             unformatted = unformatted_source_file.path,
+             formatted = source_file.path,
+         ),
++        use_default_shell_env = True,
+         toolchain = None,
      )
-diff --git a/xls/ir/BUILD b/xls/ir/BUILD
-index 59ee34808..19beb037f 100644
---- a/xls/ir/BUILD
-+++ b/xls/ir/BUILD
-@@ -1162,11 +1162,9 @@ genrule(
-     srcs = ["op_header.tmpl"],
-     outs = ["op.h"],
-     cmd = "$(location :render_specification_against_template) $(location :op_header.tmpl)" +
--          " | $(location @llvm_toolchain//:clang-format)" +
-           " > $(OUTS)",
-     tools = [
-         ":render_specification_against_template",
--        "@llvm_toolchain//:clang-format",
-     ],
- )
- 
-@@ -1200,11 +1198,9 @@ genrule(
-     srcs = ["op_source.tmpl"],
-     outs = ["op.cc"],
-     cmd = "$(location :render_specification_against_template) $(location :op_source.tmpl)" +
--          " | $(location @llvm_toolchain//:clang-format)" +
-           " > $(OUTS)",
-     tools = [
-         ":render_specification_against_template",
--        "@llvm_toolchain//:clang-format",
-     ],
- )
- 
-@@ -1213,11 +1209,9 @@ genrule(
-     srcs = ["nodes_header.tmpl"],
-     outs = ["nodes.h"],
-     cmd = "$(location :render_specification_against_template) $(location :nodes_header.tmpl)" +
--          " | $(location @llvm_toolchain//:clang-format)" +
-           " > $(OUTS)",
-     tools = [
-         ":render_specification_against_template",
--        "@llvm_toolchain//:clang-format",
-     ],
- )
- 
-@@ -1226,11 +1220,9 @@ genrule(
-     srcs = ["nodes_source.tmpl"],
-     outs = ["nodes.cc"],
-     cmd = "$(location :render_specification_against_template) $(location :nodes_source.tmpl)" +
--          " | $(location @llvm_toolchain//:clang-format)" +
-           " > $(OUTS)",
-     tools = [
-         ":render_specification_against_template",
--        "@llvm_toolchain//:clang-format",
-     ],
- )
  
