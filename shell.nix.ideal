@@ -1,10 +1,10 @@
 { pkgs ? import <nixpkgs> {} }:
 let
-  #xls_used_stdenv = pkgs.stdenv;   # clang-tidy and clangd works
-  xls_used_stdenv = pkgs.clang17Stdenv;  # official toolchain, not creating compile errors, but above won't work
+  xls_used_stdenv = pkgs.stdenv;   # clang-tidy and clangd works
+  #xls_used_stdenv = pkgs.clang17Stdenv;  # official toolchain, not creating compile errors, but above won't work
 
-  bazel = pkgs.bazel_6.override {
-    enableNixHacks = true;  # to be evaluated
+  bazel = pkgs.bazel_7.override {
+    enableNixHacks = false;  # to be evaluated
   };
 in
 xls_used_stdenv.mkDerivation {
@@ -23,6 +23,7 @@ xls_used_stdenv.mkDerivation {
       lcov              # Coverage.
       bazel-buildtools  # buildifier
       clang-tools_17    # clang-format
+      #bant              # build_cleaner
     ];
 
    shellHook =

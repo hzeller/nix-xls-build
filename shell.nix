@@ -15,17 +15,14 @@ VERSION_ID="12"
     '';
     };
   };
-  bazel = pkgs.bazel_6.override {
-    enableNixHacks = false;  # does not make a difference
-  };
-
 in (pkgs.buildFHSEnv {
   name = "xls-compile-environment";
   targetPkgs = pkgs: (with pkgs; [
     osrelease          # fake os-release so that blaze llvm download works
 
-    gcc                # bootstrap
-    bazel jdk11      # build tool
+    gcc
+    bazel_7 jdk11        # build tool
+    stdenv
     git cacert         # some recursive workspace dependencies via git.
 
     # Various libraries that Python links dynamically
