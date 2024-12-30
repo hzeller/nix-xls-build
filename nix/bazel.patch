@@ -1,5 +1,5 @@
 diff --git a/src/main/java/com/google/devtools/build/lib/shell/JavaSubprocessFactory.java b/src/main/java/com/google/devtools/build/lib/shell/JavaSubprocessFactory.java
-index 649647c..9753759 100755
+index 649647c5f2..0bd28eae23 100644
 --- a/src/main/java/com/google/devtools/build/lib/shell/JavaSubprocessFactory.java
 +++ b/src/main/java/com/google/devtools/build/lib/shell/JavaSubprocessFactory.java
 @@ -165,7 +165,7 @@ public class JavaSubprocessFactory implements SubprocessFactory {
@@ -7,7 +7,7 @@ index 649647c..9753759 100755
      builder.command(argv);
      if (params.getEnv() != null) {
 -      builder.environment().clear();
-+      //builder.environment().clear();
++      builder.environment().entrySet().removeIf(entry -> !entry.getKey().equals("NIX_LD_LIBRARY_PATH"));
        builder.environment().putAll(params.getEnv());
      }
  
