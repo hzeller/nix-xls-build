@@ -1,0 +1,13 @@
+diff --git a/src/main/java/com/google/devtools/build/lib/shell/JavaSubprocessFactory.java b/src/main/java/com/google/devtools/build/lib/shell/JavaSubprocessFactory.java
+index 649647c..9753759 100755
+--- a/src/main/java/com/google/devtools/build/lib/shell/JavaSubprocessFactory.java
++++ b/src/main/java/com/google/devtools/build/lib/shell/JavaSubprocessFactory.java
+@@ -165,7 +165,7 @@ public class JavaSubprocessFactory implements SubprocessFactory {
+     }
+     builder.command(argv);
+     if (params.getEnv() != null) {
+-      builder.environment().clear();
++      //builder.environment().clear();
+       builder.environment().putAll(params.getEnv());
+     }
+ 
