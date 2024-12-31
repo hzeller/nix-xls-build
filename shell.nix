@@ -1,15 +1,12 @@
 { pkgs ? import <nixpkgs> {} }:
 let
-  bazelOverride = ((pkgs.bazel_7.override {
-    enableNixHacks = false;
-  }).overrideAttrs (
+  bazelOverride = pkgs.bazel_7.overrideAttrs (
     previousAttrs: {
-      # Provide our own hacks, latest ones seem to introduce repo issues.
+      # Provide our own hack, latest enableNixHacks introduces repo issues.
       patches = previousAttrs.patches ++ [
         ./nix/bazel.patch
       ];
-    }
-  ));
+    });
 
   # Required for toolchains_llvm
   bazelRunLibs = with pkgs; [
