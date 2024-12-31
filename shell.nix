@@ -13,7 +13,6 @@ let
 
   # Required for toolchains_llvm
   bazelRunLibs = with pkgs; [
-    ncurses5
     stdenv.cc.cc
     zlib
     zstd
