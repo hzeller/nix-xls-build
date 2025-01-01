@@ -80,7 +80,6 @@ pkgs.mkShell {
     ''
      cat > user.bazelrc <<EOF
 common --override_repository=toolchains_llvm=${toolchains_llvm}
-build:asan --copt -static-libasan
 EOF
    '';
 }
