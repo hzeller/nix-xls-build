@@ -68,6 +68,8 @@ pkgs.mkShell {
     gdb
     zlib
     zlib.dev
+    python3
+    perl
     bc
   ];
 
