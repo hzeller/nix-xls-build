@@ -63,15 +63,10 @@ pkgs.mkShell {
     git
     bazelOverride
     jdk17
-    valgrind
-    gopls
-    gdb
     zlib
-    zlib.dev
     python3
     perl
-    infocmp
-    bc
+    ncurses
   ];
 
   # Override .bazelversion. We only care to have bazel 7.
