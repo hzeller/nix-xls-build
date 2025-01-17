@@ -7,7 +7,7 @@ index 649647c5f2..0bd28eae23 100644
      builder.command(argv);
      if (params.getEnv() != null) {
 -      builder.environment().clear();
-+      builder.environment().entrySet().removeIf(entry -> !entry.getKey().equals("NIX_LD_LIBRARY_PATH"));
++      builder.environment().entrySet().removeIf(entry -> !(entry.getKey().equals("NIX_LD_LIBRARY_PATH") || entry.getKey().equals("PATH")));
        builder.environment().putAll(params.getEnv());
      }
  
