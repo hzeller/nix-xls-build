@@ -60,13 +60,16 @@ in
 pkgs.mkShell {
   name = "build-environment";
   packages = with pkgs; [
-    git
+    git cacert
     bazelOverride
     jdk17
     zlib
     python3
     perl
     ncurses
+
+    # development convenience
+    less
   ];
 
   # Override .bazelversion. We only care to have bazel 7.
