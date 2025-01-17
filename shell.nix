@@ -70,6 +70,7 @@ pkgs.mkShell {
     zlib.dev
     python3
     perl
+    infocmp
     bc
   ];
 
