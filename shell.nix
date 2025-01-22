@@ -70,6 +70,7 @@ pkgs.mkShell {
 
     # development convenience
     less
+    bazel-buildtools  # buildifier
   ];
 
   # Override .bazelversion. We only care to have bazel 7.
