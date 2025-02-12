@@ -81,7 +81,7 @@ pkgs.mkShell {
   shellHook =
     ''
      cat > user.bazelrc <<EOF
-common --override_repository=toolchains_llvm=${toolchains_llvm}
+common --override_module=toolchains_llvm=${toolchains_llvm}
 EOF
    '';
 }
