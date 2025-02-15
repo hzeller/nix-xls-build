@@ -68,18 +68,32 @@ pkgs.mkShell {
     perl
     ncurses
 
-    # development convenience
+    # Development convenience tools.
+    #
+    # Note, since this modifies the PATH, adding things here will
+    # also invalidate the bazel cache due to the pass-through
+    # of PATH we have to do.
+    #
+    # TODO: make this less impacting probably with a wrapper
+    # for bazel that only selectively adds the paths to binaries
+    # we need during build.
     less
     bazel-buildtools  # buildifier
+    clang-tools_17
   ];
 
-  # Override .bazelversion. We only care to have bazel 7.
+  # Override .bazelversion. We only care about our bazel we created.
   USE_BAZEL_VERSION = "${bazelOverride.version}";
   NIX_LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath bazelRunLibs;
   CPATH = pkgs.lib.makeLibraryPath bazelRunLibs;
   TOOLCHAINS_LLVM = "${toolchains_llvm}";
+
+  # We use system clang-tidy for run-clang-tidy-cached.sh as the one
+  # provided by the toolchain does not find its includes by itself.
+  CLANG_TIDY = "${pkgs.clang-tools_17}/bin/clang-tidy";
   shellHook =
     ''
+     # Tell bazel to use the toolchain we prepared above
      cat > user.bazelrc <<EOF
 common --override_module=toolchains_llvm=${toolchains_llvm}
 EOF

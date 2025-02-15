@@ -1,10 +1,10 @@
 My local hacks to make xls compile on nix.
 
-In your xls checkout, link the shell.nix and nix/
-to your directory (and the patch for convenience).
+In your xls checkout, link/copy the shell.nix and nix/
+directory to the root of the xls checkout.
 
 Since bazel downloads random non-hermetic dynamically
-linked binaries (such as Python), requires
+linked binaries, this requires
 
   programs.nix-ld.enable = true
 
