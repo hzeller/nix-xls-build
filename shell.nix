@@ -8,6 +8,26 @@ let
       ];
     });
 
+  bazelBinExtra = with pkgs; [
+    git      # fetching openroad
+    perl     # uses in build of iverilog
+    ncurses  # something is using tools from there to query terminal
+    gcc14    # `ar` for z3; `cpp` for net_invisible_island_ncurses//:lib_gen_c
+  ];
+  bazelExtraBinPath = pkgs.lib.makeBinPath bazelBinExtra;
+
+  # TODO: this is a hack of sorts. Ideally, we'd just like to add all these
+  # binaries to what is referred to in the bazel package as `defaultShellUtils`
+  #
+  # If we can do that, they are 'baked into' the bazel installation, and
+  # we can remove adding PATH to the excemption environment variables in
+  # nix/bazel.patch
+  wrappedBazel = pkgs.writeShellScriptBin "bazel" ''
+  # Invoking bazel with the extra PATH to tools required by XLS compilation.
+  export PATH=${bazelExtraBinPath}
+  exec ${bazelOverride}/bin/bazel "$@"
+'';
+
   # Required for toolchains_llvm
   bazelRunLibs = with pkgs; [
     stdenv.cc.cc
@@ -58,25 +78,14 @@ let
   };
 in
 pkgs.mkShell {
-  name = "build-environment";
+  name = "xls-build-environment";
   packages = with pkgs; [
-    git cacert
-    bazelOverride
-    jdk17
-    zlib
-    python3
-    perl
-    ncurses
+    wrappedBazel
+
+    cacert  # needed by git
+    jdk17   # bazel ...
 
     # Development convenience tools.
-    #
-    # Note, since this modifies the PATH, adding things here will
-    # also invalidate the bazel cache due to the pass-through
-    # of PATH we have to do.
-    #
-    # TODO: make this less impacting probably with a wrapper
-    # for bazel that only selectively adds the paths to binaries
-    # we need during build.
     less
     bazel-buildtools  # buildifier
     clang-tools_17
@@ -91,6 +100,7 @@ pkgs.mkShell {
   # We use system clang-tidy for run-clang-tidy-cached.sh as the one
   # provided by the toolchain does not find its includes by itself.
   CLANG_TIDY = "${pkgs.clang-tools_17}/bin/clang-tidy";
+
   shellHook =
     ''
      # Tell bazel to use the toolchain we prepared above
