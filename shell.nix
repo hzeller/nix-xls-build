@@ -33,7 +33,7 @@ let
     stdenv.cc.cc
     zlib
     zstd
-    libtinfo
+    ncurses  # libtinfo, really
     libxml2
     expat
   ];
@@ -88,7 +88,7 @@ pkgs.mkShell {
     # Development convenience tools.
     less
     bazel-buildtools  # buildifier
-    clang-tools_17
+    clang-tools_19
   ];
 
   # Override .bazelversion. We only care about our bazel we created.
@@ -99,7 +99,7 @@ pkgs.mkShell {
 
   # We use system clang-tidy for run-clang-tidy-cached.sh as the one
   # provided by the toolchain does not find its includes by itself.
-  CLANG_TIDY = "${pkgs.clang-tools_17}/bin/clang-tidy";
+  CLANG_TIDY = "${pkgs.clang-tools_19}/bin/clang-tidy";
 
   shellHook =
     ''
